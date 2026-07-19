@@ -23,3 +23,10 @@ public interface ICommandHandler<TCommand, TResult> : ICommandHandlerWrapper<TRe
     Task<TResult> ICommandHandlerWrapper<TResult>.Handle(ICommand<TResult> command, CancellationToken cancellationToken)
         => Handle((TCommand)command, cancellationToken);
 }
+
+/// <summary>
+/// Handles commands of type <typeparamref name="TCommand"/> that produce a plain <see cref="Result"/>.
+/// </summary>
+/// <typeparam name="TCommand">The type of command handled.</typeparam>
+public interface ICommandHandler<TCommand> : ICommandHandler<TCommand, Result>
+    where TCommand : ICommand { }
