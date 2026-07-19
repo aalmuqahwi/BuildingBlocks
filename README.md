@@ -7,3 +7,5 @@ Reusable Domain/Application/Infrastructure building blocks (DDD, Clean Architect
 
 ## Packages
 - `BuildingBlocks.Domain` — Entity, AggregateRoot, ValueObject, IDomainEvent, Result
+- `BuildingBlocks.Application` — ICommand, IQuery, handler contracts, IDispatcher, IPipelineBehavior (CQRS abstractions)
+- `BuildingBlocks.Infrastructure` — DI-based Dispatcher and service registration for the Application abstractions
