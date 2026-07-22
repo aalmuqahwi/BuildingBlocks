@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         params Assembly[] assemblies)
     {
         services.AddDispatcher(assemblies);
+        services.AddDomainEventDispatcher(assemblies);
 
         return services;
     }
