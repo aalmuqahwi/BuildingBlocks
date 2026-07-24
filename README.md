@@ -29,6 +29,14 @@ Concrete DI-based implementations, depends on `BuildingBlocks.Application`.
 - `DomainEventDispatcher` — resolves and invokes all registered handlers for a given domain event
 - `AddBuildingBlocksInfrastructure(...)` — one-line registration for everything above (or call `AddDispatcher(...)` / `AddDomainEventDispatcher(...)` individually)
 
+## Installation
+
+```
+dotnet add package aalmuqahwi.BuildingBlocks.Domain
+dotnet add package aalmuqahwi.BuildingBlocks.Application
+dotnet add package aalmuqahwi.BuildingBlocks.Infrastructure
+```
+
 ## Usage
 
 ```csharp
