@@ -5,8 +5,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <Version>0.1.0</Version>
+    <PackageId>aalmuqahwi.BuildingBlocks.Domain</PackageId>
+    <Description>Core DDD primitives — Result, Entity, AggregateRoot, DomainEvent, ValueObject. No external dependencies.</Description>
+    <PackageTags>ddd;building-blocks</PackageTags>
   </PropertyGroup>
 
 </Project>
