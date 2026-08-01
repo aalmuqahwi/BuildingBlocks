@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddDispatcher(assemblies);
         services.AddDomainEventDispatcher(assemblies);
+        services.AddOutboxProcessor();
 
         return services;
     }
