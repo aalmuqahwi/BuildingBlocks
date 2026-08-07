@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <PackageId>aalmuqahwi.BuildingBlocks.Infrastructure</PackageId>
-    <Description>DI-based Dispatcher and DomainEventDispatcher implementations for BuildingBlocks.Application.</Description>
+    <Description>DI-based Dispatcher, DomainEventDispatcher, IntegrationEventDispatcher, OutboxWriter, and OutboxProcessor implementations for BuildingBlocks.Application.</Description>
     <PackageTags>ddd;cqrs;clean-architecture;building-blocks</PackageTags>
   </PropertyGroup>
 

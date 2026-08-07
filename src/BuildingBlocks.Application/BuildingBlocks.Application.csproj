@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <PackageId>aalmuqahwi.BuildingBlocks.Application</PackageId>
-    <Description>CQRS and cross-cutting contracts — ICommand, IQuery, IDispatcher, IPipelineBehavior, IUnitOfWork. Depends on BuildingBlocks.Domain.</Description>
+    <Description>CQRS and cross-cutting contracts — ICommand, IQuery, IDispatcher, IPipelineBehavior, IUnitOfWork, IIntegrationEvent, IOutboxWriter, IOutboxMessageStore, IOutboxProcessor. Depends on BuildingBlocks.Domain.</Description>
     <PackageTags>ddd;cqrs;clean-architecture;building-blocks</PackageTags>
   </PropertyGroup>
 
