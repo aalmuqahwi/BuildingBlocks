@@ -24,6 +24,7 @@ public interface IOutboxMessageStore
     /// </summary>
     /// <param name="id">The identifier of the outbox message.</param>
     /// <param name="error">A description of the error that caused processing to fail.</param>
+    /// <param name="retryCount">The total number of processing attempts made for the message so far, including this one.</param>
     /// <param name="cancellationToken">A token to observe for cancellation requests.</param>
-    Task MarkFailedAsync(Guid id, string error, CancellationToken cancellationToken);
+    Task MarkFailedAsync(Guid id, string error, int retryCount, CancellationToken cancellationToken);
 }

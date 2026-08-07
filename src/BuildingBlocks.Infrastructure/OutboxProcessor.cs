@@ -48,7 +48,7 @@ public sealed class OutboxProcessor : IOutboxProcessor
             }
             catch (Exception ex)
             {
-                await _store.MarkFailedAsync(message.Id, ex.Message, cancellationToken);
+                await _store.MarkFailedAsync(message.Id, ex.Message, message.RetryCount + 1, cancellationToken);
             }
         }
     }
