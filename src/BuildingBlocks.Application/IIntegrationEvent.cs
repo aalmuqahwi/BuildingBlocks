@@ -11,7 +11,7 @@ public interface IIntegrationEvent
     Guid Id { get; }
 
     /// <summary>
-    /// Gets the date and time at which the event occurred.
+    /// Gets the UTC date and time at which the event occurred.
     /// </summary>
-    DateTime OccurredOn { get; }
+    DateTime OccurredOnUtc { get; }
 }

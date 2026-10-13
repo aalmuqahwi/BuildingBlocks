@@ -1,4 +1,5 @@
 using BuildingBlocks.Application;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BuildingBlocks.Infrastructure;
@@ -18,12 +19,13 @@ public sealed class IntegrationEventDispatcher : IIntegrationEventDispatcher
         => _serviceProvider = serviceProvider;
 
     /// <inheritdoc />
-    public async Task DispatchAsync<T>(T integrationEvent, CancellationToken cancellationToken)
-        where T : IIntegrationEvent
+    public async Task DispatchAsync(IIntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
-        var handlers = _serviceProvider.GetServices<IIntegrationEventHandler<T>>();
+        var handlerType = typeof(IIntegrationEventHandler<>)
+            .MakeGenericType(integrationEvent.GetType());
 
-        foreach (var handler in handlers)
+        foreach (IIntegrationEventHandler handler in _serviceProvider
+            .GetServices(handlerType).Cast<IIntegrationEventHandler>())
         {
             await handler.Handle(integrationEvent, cancellationToken);
         }

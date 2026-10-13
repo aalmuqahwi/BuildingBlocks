@@ -7,8 +7,8 @@ namespace BuildingBlocks.Infrastructure.Tests;
 #pragma warning disable CS1591
 public record TestIntegrationEvent : IIntegrationEvent
 {
-    public Guid Id => Guid.NewGuid();
-    public DateTime OccurredOn => DateTime.UtcNow;
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public DateTime OccurredOnUtc { get; init; } = DateTime.UtcNow;
 }
 
 public class IntegrationEventDispatcherTests
