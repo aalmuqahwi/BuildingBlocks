@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <PackageId>aalmuqahwi.BuildingBlocks.Domain</PackageId>
     <Description>Core DDD primitives — Result, Entity, AggregateRoot, DomainEvent, ValueObject. No external dependencies.</Description>
     <PackageTags>ddd;building-blocks</PackageTags>
