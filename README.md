@@ -76,7 +76,32 @@ So events are never handled in `SaveChanges`. They are **saved** to the outbox i
 
 Each event is stored as **one message per registered handler**, so handlers succeed, fail and retry independently: a failing handler never causes another handler's email to be sent twice.
 
-**1. Persist events with your data.** Inside your `DbContext`'s `SaveChangesAsync` override (or equivalent):
+**1. Create the outbox table.** The library is technology-agnostic, so it ships no migrations or scripts — create one table matching `OutboxMessage` in your own database (e.g. map it in your `DbContext` and add a migration):
+
+| Column | Type | Nullable | Notes |
+|---|---|---|---|
+| `Id` | GUID | No | Primary key |
+| `Type` | string, unbounded | No | Event type name, e.g. `MyApp.Orders.OrderPlaced, MyApp` |
+| `Handler` | string, unbounded | No | Handler type name the message is delivered to |
+| `Payload` | string, unbounded | No | Serialized event (JSON by default) |
+| `OccurredOnUtc` | date/time | No | When the event occurred |
+| `ProcessedOnUtc` | date/time | Yes | `NULL` while pending |
+| `Error` | string, unbounded | Yes | Error from the most recent failed attempt |
+| `RetryCount` | int | No | Defaults to `0` |
+
+Keep the string columns unbounded (e.g. `nvarchar(max)` on SQL Server, `text` on PostgreSQL). Type names can be long — generic events include their type arguments' full names — and none of these columns is indexed, so a length limit gains nothing. If you do cap them, a name that doesn't fit fails the **whole** `SaveChanges`, including the business data that raised the event.
+
+Indexes:
+- **Polling (required).** The processor queries pending messages, oldest first, on every run; without an index each poll scans the whole table, which only grows.
+  - With filtered indexes (SQL Server, PostgreSQL): index `(OccurredOnUtc)` `WHERE ProcessedOnUtc IS NULL` — it holds only pending rows, so it stays small.
+  - Without (e.g. MySQL): index `(ProcessedOnUtc, OccurredOnUtc)`.
+  - If your `GetPendingAsync` also filters on `RetryCount` (e.g. to skip dead-lettered messages), add `RetryCount` to this index.
+- **Primary key on `Id`.** Covers `MarkProcessedAsync` / `MarkFailedAsync`. On SQL Server, declare it `NONCLUSTERED`: message IDs are random GUIDs, and a clustered index on random keys fragments an insert-heavy table. PostgreSQL doesn't cluster tables, so it's unaffected.
+- **Cleanup (optional).** The filtered polling index excludes processed rows, so deleting old processed messages scans the table. That's fine for an occasional, batched cleanup job; if cleanup runs often or the table is very large, add an index on `ProcessedOnUtc`.
+
+Processed messages are never deleted by the library; clean them up periodically (e.g. delete rows processed more than a week ago) to keep the table small.
+
+**2. Persist events with your data.** Inside your `DbContext`'s `SaveChangesAsync` override (or equivalent):
 ```csharp
 var domainEvents = ChangeTracker.Entries<IHasDomainEvents>()
     .SelectMany(e => e.Entity.PopDomainEvents());
@@ -90,7 +115,7 @@ OutboxMessages.AddRange(_outboxWriter.Flush());
 return await base.SaveChangesAsync(ct);
 ```
 
-**2. Chain events from handlers.** A domain event handler that needs to publish an integration event writes it to the outbox rather than calling a broker directly — calling the broker would reintroduce the same consistency problem:
+**3. Chain events from handlers.** A domain event handler that needs to publish an integration event writes it to the outbox rather than calling a broker directly — calling the broker would reintroduce the same consistency problem:
 ```csharp
 public class OrderPlacedHandler(IOutboxWriter outboxWriter) : IDomainEventHandler<OrderPlaced>
 {
@@ -103,7 +128,7 @@ public class OrderPlacedHandler(IOutboxWriter outboxWriter) : IDomainEventHandle
 ```
 The processor commits the events a handler wrote and the processed mark in the same transaction, so they are saved together or not at all.
 
-**3. Implement the store.** Store methods only *stage* changes — the processor commits them through `IUnitOfWork`, which must share the store's scope (e.g. the same `DbContext`):
+**4. Implement the store.** Store methods only *stage* changes — the processor commits them through `IUnitOfWork`, which must share the store's scope (e.g. the same `DbContext`):
 ```csharp
 public class EfOutboxMessageStore(AppDbContext db) : IOutboxMessageStore
 {
@@ -128,7 +153,7 @@ public class EfOutboxMessageStore(AppDbContext db) : IOutboxMessageStore
 }
 ```
 
-**4. Register and process**, triggered by whatever scheduler you prefer:
+**5. Register and process**, triggered by whatever scheduler you prefer:
 ```csharp
 // Program.cs
 builder.Services.AddBuildingBlocksInfrastructure(typeof(Program).Assembly); // scans command, query and domain event handlers
