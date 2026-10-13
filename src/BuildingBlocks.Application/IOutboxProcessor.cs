@@ -1,7 +1,7 @@
 namespace BuildingBlocks.Application;
 
 /// <summary>
-/// Processes pending outbox messages by dispatching their integration events.
+/// Processes pending outbox messages by delivering their events to the handlers they were written for.
 /// </summary>
 public interface IOutboxProcessor
 {

@@ -1,8 +1,11 @@
 namespace BuildingBlocks.Application;
 
 /// <summary>
-/// Represents a persisted integration event awaiting or having completed dispatch.
+/// Represents a persisted event awaiting or having completed delivery to a single handler.
 /// </summary>
+/// <remarks>
+/// An event with several handlers is persisted as one message per handler, so each handler succeeds, fails, and retries independently.
+/// </remarks>
 public sealed class OutboxMessage
 {
     /// <summary>
@@ -11,12 +14,17 @@ public sealed class OutboxMessage
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the assembly-qualified type name of the integration event.
+    /// Gets or sets the type name of the event, as produced by <see cref="IOutboxSerializer.GetTypeName"/>.
     /// </summary>
     public string Type { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the serialized integration event payload.
+    /// Gets or sets the type name of the handler the message is delivered to, as produced by <see cref="IOutboxSerializer.GetTypeName"/>.
+    /// </summary>
+    public string Handler { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the serialized event payload.
     /// </summary>
     public string Payload { get; set; } = string.Empty;
 
